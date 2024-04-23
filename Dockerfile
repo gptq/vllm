@@ -110,7 +110,7 @@ WORKDIR /usr/src/flash-attention-v2
 
 # Download the wheel or build it if a pre-compiled release doesn't exist
 
-RUN pip  --index-url ${PYPI_MIRROR}  --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
+RUN pip  --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
     --no-build-isolation --no-deps --no-cache-dir
 
 #################### FLASH_ATTENTION Build IMAGE ####################
