@@ -64,7 +64,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  -r requirements-build.txt
 
 # install compiler cache to speed up compilation leveraging local or remote caching
-RUN apt-get update -y && apt-get install -y ccache
+RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
+                  export https_proxy=$HTTPS_PROXY && \
+                  export no_proxy=$NO_PROXY && \
+                  apt-get update -y && \
+                  apt-get install -y ccache"
 
 # files and directories related to build wheels
 COPY csrc csrc
