@@ -11,12 +11,12 @@ ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
 
+# 替换为科大源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn\/ubuntu\//g' /etc/apt/sources.list && \
+    apt-get update -y && \
+    apt-get install -y python3-pip git
+    
 
-RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
-                  export https_proxy=$HTTPS_PROXY && \
-                  export no_proxy=$NO_PROXY && \
-                  apt-get update -y && \
-                  apt-get install -y python3-pip git"
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
@@ -64,11 +64,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  -r requirements-build.txt
 
 # install compiler cache to speed up compilation leveraging local or remote caching
-RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
-                  export https_proxy=$HTTPS_PROXY && \
-                  export no_proxy=$NO_PROXY && \
-                  apt-get update -y && \
-                  apt-get install -y ccache"
+# 替换为科大源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn\/ubuntu\//g' /etc/apt/sources.list && \
+    apt-get update -y && \
+    apt-get install -y ccache
 
 # files and directories related to build wheels
 COPY csrc csrc
@@ -147,11 +146,12 @@ ARG NO_PROXY
 
 WORKDIR /vllm-workspace
 
-RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
-                  export https_proxy=$HTTPS_PROXY && \
-                  export no_proxy=$NO_PROXY && \
-                  apt-get update -y && \
-                  apt-get install -y python3-pip git vim"
+# 替换为科大源
+RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn\/ubuntu\//g' /etc/apt/sources.list && \
+    apt-get update -y && \
+    apt-get install -y python3-pip git vim
+    
+
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
