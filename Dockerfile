@@ -157,18 +157,12 @@ RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
 # this won't be needed for future versions of this docker image
 # or future versions of triton.
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    ldconfig /usr/local/cuda-12.1/compat/
+## 使用代理进行操作，如安装包等
+RUN ldconfig /usr/local/cuda-12.1/compat/
 
 # install vllm wheel first, so that torch etc will be installed
 # 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
+RUN --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
     --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  dist/*.whl --verbose
 
