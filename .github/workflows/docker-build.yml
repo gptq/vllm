@@ -31,4 +31,4 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/vllm:latest  # 修改为您的 Docker Hub 用户名和镜像名
 
     - name: Run image
-      #run: docker run yourusername/yourimage:latest  # 可选，运行测试
+      #run: docker run ${{ secrets.DOCKER_USERNAME }}/vllm:latest  # 可选，运行测试
