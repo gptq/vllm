@@ -31,3 +31,6 @@ jobs:
         push: true
         platforms: linux/amd64
         tags: ${{ secrets.DOCKER_USERNAME }}/vllm:latest  # 修改为您的 Docker Hub 用户名和期望的镜像标签
+    - name: Cleanup workspace
+    - run: rm -rf path/to/temp/files
+    - run: docker system prune -af  # 清理未使用的 Docker 对象
