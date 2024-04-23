@@ -14,6 +14,8 @@ Easy, fast, and cheap LLM serving for everyone
 
 </p>
 
+docker build --build-arg PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/ -t vllm-image .
+
 *Latest News* 🔥
 - [2024/04] We hosted [the third vLLM meetup](https://robloxandvllmmeetup2024.splashthat.com/) with Roblox! Please find the meetup slides [here](https://docs.google.com/presentation/d/1A--47JAK4BJ39t954HyTkvtfwn0fkqtsL8NGFuslReM/edit?usp=sharing).
 - [2024/01] We hosted [the second vLLM meetup](https://lu.ma/ygxbpzhl) in SF! Please find the meetup slides [here](https://docs.google.com/presentation/d/12mI2sKABnUw5RBWXDYY-HtHth4iMSNcEoQ10jDQbxgA/edit?usp=sharing).
