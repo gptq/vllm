@@ -3,7 +3,8 @@
 
 #################### BASE BUILD IMAGE ####################
 # prepare basic build environment
-FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS dev
+#FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS dev
+FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
 
 RUN apt-get update -y \
     && apt-get install -y python3-pip git
@@ -147,7 +148,7 @@ FROM vllm-base AS vllm-openai
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install accelerate hf_transfer modelscope
+    pip install accelerate hf_transfer modelscope  auto-gptq deepspeed datasets jsonlines peft safetensors torch transformers fastapi uvicorn streamlit
 
 ENV VLLM_USAGE_SOURCE production-docker-image
 
