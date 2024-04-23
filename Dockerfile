@@ -27,12 +27,12 @@ WORKDIR /workspace
 COPY requirements-common.txt requirements-common.txt
 COPY requirements-cuda.txt requirements-cuda.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  -r requirements-cuda.txt
+    pip install  -r requirements-cuda.txt -vvv
 
 # install development dependencies
 COPY requirements-dev.txt requirements-dev.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  -r requirements-dev.txt
+    pip install  -r requirements-dev.txt -vvv
 
 # cuda arch list used by torch
 # can be useful for both `dev` and `test`
