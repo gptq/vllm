@@ -4,6 +4,7 @@
 #################### BASE BUILD IMAGE ####################
 # prepare basic build environment
 #FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS dev
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
 
 RUN apt-get update -y \
