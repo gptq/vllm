@@ -7,6 +7,9 @@
 #ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
 
 RUN apt-get update -y \
     && apt-get install -y python3-pip git
@@ -42,6 +45,9 @@ ENV TORCH_CUDA_ARCH_LIST=${torch_cuda_arch_list}
 #################### WHEEL BUILD IMAGE ####################
 FROM dev AS build
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
 
 # install build dependencies
 COPY requirements-build.txt requirements-build.txt
@@ -86,6 +92,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 #################### FLASH_ATTENTION Build IMAGE ####################
 FROM dev as flash-attn-builder
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+
 # max jobs used for build
 ARG max_jobs=2
 ENV MAX_JOBS=${max_jobs}
@@ -105,6 +115,10 @@ RUN pip --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
 # image with vLLM installed
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04 AS vllm-base
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+
 WORKDIR /vllm-workspace
 
 RUN apt-get update -y \
@@ -132,6 +146,9 @@ RUN --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,ta
 # note that this uses vllm installed by `pip`
 FROM vllm-base AS test
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
 
 ADD . /vllm-workspace/
 
@@ -152,6 +169,9 @@ RUN mv vllm test_docs/
 # openai api server alternative
 FROM vllm-base AS vllm-openai
 ARG PYPI_MIRROR
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
