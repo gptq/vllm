@@ -12,8 +12,11 @@ ARG HTTPS_PROXY
 ARG NO_PROXY
 
 
-RUN apt-get update -y \
-    && apt-get install -y python3-pip git
+RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
+                  export https_proxy=$HTTPS_PROXY && \
+                  export no_proxy=$NO_PROXY && \
+                  apt-get update -y && \
+                  apt-get install -y python3-pip git"
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
@@ -140,8 +143,11 @@ ARG NO_PROXY
 
 WORKDIR /vllm-workspace
 
-RUN apt-get update -y \
-    && apt-get install -y python3-pip git vim
+RUN /bin/bash -c "export http_proxy=$HTTP_PROXY && \
+                  export https_proxy=$HTTPS_PROXY && \
+                  export no_proxy=$NO_PROXY && \
+                  apt-get update -y && \
+                  apt-get install -y python3-pip git vim"
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
