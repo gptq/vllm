@@ -28,7 +28,7 @@ COPY requirements-common.txt requirements-common.txt
 COPY requirements-cuda.txt requirements-cuda.txt
 #RUN --mount=type=cache,target=/root/.cache/pip     pip install  -r requirements-cuda.txt -vvv
 RUN --mount=type=cache,target=/root/.cache/pip pip install ray 
-RUN --mount=type=cache,target=/root/.cache/pip pip install pynvml == 11.5.0
+RUN --mount=type=cache,target=/root/.cache/pip pip install pynvml -vvv
 RUN --mount=type=cache,target=/root/.cache/pip pip install vllm-nccl-cu12=2.18
 RUN --mount=type=cache,target=/root/.cache/pip pip install torch == 2.2.1
 RUN --mount=type=cache,target=/root/.cache/pip pip install xformers == 0.0.25 
