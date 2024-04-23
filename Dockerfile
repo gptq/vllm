@@ -6,7 +6,7 @@
 #FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS dev
 #ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 
 # 替换为科大源
@@ -47,7 +47,7 @@ ENV TORCH_CUDA_ARCH_LIST=${torch_cuda_arch_list}
 
 #################### WHEEL BUILD IMAGE ####################
 FROM dev AS build
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 # install build dependencies
 COPY requirements-build.txt requirements-build.txt
@@ -96,7 +96,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 #################### FLASH_ATTENTION Build IMAGE ####################
 FROM dev as flash-attn-builder
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 
 # max jobs used for build
@@ -118,7 +118,7 @@ RUN pip  --index-url ${PYPI_MIRROR}  --verbose wheel flash-attn==${FLASH_ATTN_VE
 #################### vLLM installation IMAGE ####################
 # image with vLLM installed
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04 AS vllm-base
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 WORKDIR /vllm-workspace
 
@@ -153,7 +153,7 @@ RUN --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,ta
 # image to run unit testing suite
 # note that this uses vllm installed by `pip`
 FROM vllm-base AS test
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 
 
@@ -175,7 +175,7 @@ RUN mv vllm test_docs/
 #################### OPENAI API SERVER ####################
 # openai api server alternative
 FROM vllm-base AS vllm-openai
-ARG PYPI_MIRROR
+ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 
 # install additional dependencies for openai api server
