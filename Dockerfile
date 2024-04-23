@@ -21,12 +21,12 @@ WORKDIR /workspace
 COPY requirements-common.txt requirements-common.txt
 COPY requirements-cuda.txt requirements-cuda.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements-cuda.txt
+    pip install --index-url ${PYPI_MIRROR}  -r requirements-cuda.txt
 
 # install development dependencies
 COPY requirements-dev.txt requirements-dev.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements-dev.txt
+    pip install --index-url ${PYPI_MIRROR}  -r requirements-dev.txt
 
 # cuda arch list used by torch
 # can be useful for both `dev` and `test`
@@ -43,7 +43,7 @@ FROM dev AS build
 # install build dependencies
 COPY requirements-build.txt requirements-build.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements-build.txt
+    pip install --index-url ${PYPI_MIRROR}  -r requirements-build.txt
 
 # install compiler cache to speed up compilation leveraging local or remote caching
 RUN apt-get update -y && apt-get install -y ccache
@@ -114,11 +114,11 @@ RUN ldconfig /usr/local/cuda-12.1/compat/
 # install vllm wheel first, so that torch etc will be installed
 RUN --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
     --mount=type=cache,target=/root/.cache/pip \
-    pip install dist/*.whl --verbose
+    pip install --index-url ${PYPI_MIRROR}  dist/*.whl --verbose
 
 RUN --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,target=/usr/src/flash-attention-v2 \
     --mount=type=cache,target=/root/.cache/pip \
-    pip install /usr/src/flash-attention-v2/*.whl --no-cache-dir
+    pip install --index-url ${PYPI_MIRROR}  /usr/src/flash-attention-v2/*.whl --no-cache-dir
 #################### vLLM installation IMAGE ####################
 
 
@@ -131,7 +131,7 @@ ADD . /vllm-workspace/
 
 # install development dependencies (for testing)
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements-dev.txt
+    pip install --index-url ${PYPI_MIRROR}  -r requirements-dev.txt
 
 # doc requires source code
 # we hide them inside `test_docs/` , so that this source code
@@ -148,7 +148,7 @@ FROM vllm-base AS vllm-openai
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install accelerate hf_transfer modelscope  auto-gptq deepspeed datasets jsonlines peft safetensors torch transformers fastapi uvicorn streamlit
+    pip install --index-url ${PYPI_MIRROR}  accelerate hf_transfer modelscope  auto-gptq deepspeed datasets jsonlines peft safetensors torch transformers fastapi uvicorn streamlit
 
 ENV VLLM_USAGE_SOURCE production-docker-image
 
