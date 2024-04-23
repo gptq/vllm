@@ -12,11 +12,7 @@ ARG HTTPS_PROXY
 ARG NO_PROXY
 
 
-RUN # 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    apt-get update -y \
+RUN apt-get update -y \
     && apt-get install -y python3-pip git
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
@@ -65,10 +61,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  -r requirements-build.txt
 
 # install compiler cache to speed up compilation leveraging local or remote caching
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    apt-get update -y && apt-get install -y ccache
+RUN apt-get update -y && apt-get install -y ccache
 
 # files and directories related to build wheels
 COPY csrc csrc
@@ -147,11 +140,7 @@ ARG NO_PROXY
 
 WORKDIR /vllm-workspace
 
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    apt-get update -y \
+RUN apt-get update -y \
     && apt-get install -y python3-pip git vim
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
