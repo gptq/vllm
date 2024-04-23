@@ -7,9 +7,7 @@
 #ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
+
 
 # 替换为科大源
 RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn\/ubuntu\//g' /etc/apt/sources.list && \
@@ -22,11 +20,8 @@ RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
 # this won't be needed for future versions of this docker image
 # or future versions of triton.
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    ldconfig /usr/local/cuda-12.1/compat/
+
+RUN ldconfig /usr/local/cuda-12.1/compat/
 
 WORKDIR /workspace
 
@@ -53,10 +48,6 @@ ENV TORCH_CUDA_ARCH_LIST=${torch_cuda_arch_list}
 #################### WHEEL BUILD IMAGE ####################
 FROM dev AS build
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
-
 
 # install build dependencies
 COPY requirements-build.txt requirements-build.txt
@@ -89,11 +80,8 @@ ENV NVCC_THREADS=$nvcc_threads
 ENV VLLM_INSTALL_PUNICA_KERNELS=1
 
 ENV CCACHE_DIR=/root/.cache/ccache
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    --mount=type=cache,target=/root/.cache/ccache \
+
+RUN --mount=type=cache,target=/root/.cache/ccache \
     --mount=type=cache,target=/root/.cache/pip \
     python3 setup.py bdist_wheel --dist-dir=dist
 
@@ -101,20 +89,14 @@ RUN export http_proxy=$HTTP_PROXY && \
 # pip is too smart to store a wheel in the cache, and other CI jobs
 # will directly use the wheel from the cache, which is not what we want.
 # we need to remove it manually
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    --mount=type=cache,target=/root/.cache/pip \
+
+RUN --mount=type=cache,target=/root/.cache/pip \
     pip cache remove vllm_nccl*
 #################### EXTENSION Build IMAGE ####################
 
 #################### FLASH_ATTENTION Build IMAGE ####################
 FROM dev as flash-attn-builder
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
 
 
 # max jobs used for build
@@ -127,11 +109,8 @@ ENV FLASH_ATTN_VERSION=${flash_attn_version}
 WORKDIR /usr/src/flash-attention-v2
 
 # Download the wheel or build it if a pre-compiled release doesn't exist
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    pip --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
+
+RUN pip  --index-url ${PYPI_MIRROR}  --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
     --no-build-isolation --no-deps --no-cache-dir
 
 #################### FLASH_ATTENTION Build IMAGE ####################
@@ -140,9 +119,6 @@ RUN export http_proxy=$HTTP_PROXY && \
 # image with vLLM installed
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04 AS vllm-base
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
 
 WORKDIR /vllm-workspace
 
@@ -157,20 +133,17 @@ RUN sed -i 's/http:\/\/archive.ubuntu.com\/ubuntu\//http:\/\/mirrors.ustc.edu.cn
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
 # this won't be needed for future versions of this docker image
 # or future versions of triton.
-## 使用代理进行操作，如安装包等
+
 RUN ldconfig /usr/local/cuda-12.1/compat/
 
 # install vllm wheel first, so that torch etc will be installed
-# 使用代理进行操作，如安装包等
+
 RUN --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
     --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  dist/*.whl --verbose
 
-# 使用代理进行操作，如安装包等
-RUN export http_proxy=$HTTP_PROXY && \
-    export https_proxy=$HTTPS_PROXY && \
-    export no_proxy=$NO_PROXY && \
-    --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,target=/usr/src/flash-attention-v2 \
+
+RUN --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,target=/usr/src/flash-attention-v2 \
     --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  /usr/src/flash-attention-v2/*.whl --no-cache-dir
 #################### vLLM installation IMAGE ####################
@@ -181,9 +154,7 @@ RUN export http_proxy=$HTTP_PROXY && \
 # note that this uses vllm installed by `pip`
 FROM vllm-base AS test
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
+
 
 
 ADD . /vllm-workspace/
@@ -205,9 +176,6 @@ RUN mv vllm test_docs/
 # openai api server alternative
 FROM vllm-base AS vllm-openai
 ARG PYPI_MIRROR
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
 
 
 # install additional dependencies for openai api server
