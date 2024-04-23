@@ -10,19 +10,24 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
 
-RUN apt-get update -y \
+
+RUN # 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    apt-get update -y \
     && apt-get install -y python3-pip git
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
 # this won't be needed for future versions of this docker image
 # or future versions of triton.
-RUN ldconfig /usr/local/cuda-12.1/compat/
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    ldconfig /usr/local/cuda-12.1/compat/
 
 WORKDIR /workspace
 
@@ -52,10 +57,7 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
+
 
 # install build dependencies
 COPY requirements-build.txt requirements-build.txt
@@ -63,7 +65,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  -r requirements-build.txt
 
 # install compiler cache to speed up compilation leveraging local or remote caching
-RUN apt-get update -y && apt-get install -y ccache
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    apt-get update -y && apt-get install -y ccache
 
 # files and directories related to build wheels
 COPY csrc csrc
@@ -85,7 +90,11 @@ ENV NVCC_THREADS=$nvcc_threads
 ENV VLLM_INSTALL_PUNICA_KERNELS=1
 
 ENV CCACHE_DIR=/root/.cache/ccache
-RUN --mount=type=cache,target=/root/.cache/ccache \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    --mount=type=cache,target=/root/.cache/ccache \
     --mount=type=cache,target=/root/.cache/pip \
     python3 setup.py bdist_wheel --dist-dir=dist
 
@@ -93,7 +102,11 @@ RUN --mount=type=cache,target=/root/.cache/ccache \
 # pip is too smart to store a wheel in the cache, and other CI jobs
 # will directly use the wheel from the cache, which is not what we want.
 # we need to remove it manually
-RUN --mount=type=cache,target=/root/.cache/pip \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    --mount=type=cache,target=/root/.cache/pip \
     pip cache remove vllm_nccl*
 #################### EXTENSION Build IMAGE ####################
 
@@ -103,10 +116,7 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
+
 
 # max jobs used for build
 ARG max_jobs=2
@@ -118,7 +128,11 @@ ENV FLASH_ATTN_VERSION=${flash_attn_version}
 WORKDIR /usr/src/flash-attention-v2
 
 # Download the wheel or build it if a pre-compiled release doesn't exist
-RUN pip --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    pip --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
     --no-build-isolation --no-deps --no-cache-dir
 
 #################### FLASH_ATTENTION Build IMAGE ####################
@@ -130,28 +144,40 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
 
 WORKDIR /vllm-workspace
 
-RUN apt-get update -y \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    apt-get update -y \
     && apt-get install -y python3-pip git vim
 
 # Workaround for https://github.com/openai/triton/issues/2507 and
 # https://github.com/pytorch/pytorch/issues/107960 -- hopefully
 # this won't be needed for future versions of this docker image
 # or future versions of triton.
-RUN ldconfig /usr/local/cuda-12.1/compat/
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    ldconfig /usr/local/cuda-12.1/compat/
 
 # install vllm wheel first, so that torch etc will be installed
-RUN --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    --mount=type=bind,from=build,src=/workspace/dist,target=/vllm-workspace/dist \
     --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  dist/*.whl --verbose
 
-RUN --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,target=/usr/src/flash-attention-v2 \
+# 使用代理进行操作，如安装包等
+RUN export http_proxy=$HTTP_PROXY && \
+    export https_proxy=$HTTPS_PROXY && \
+    export no_proxy=$NO_PROXY && \
+    --mount=type=bind,from=flash-attn-builder,src=/usr/src/flash-attention-v2,target=/usr/src/flash-attention-v2 \
     --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url ${PYPI_MIRROR}  /usr/src/flash-attention-v2/*.whl --no-cache-dir
 #################### vLLM installation IMAGE ####################
@@ -165,10 +191,7 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
+
 
 ADD . /vllm-workspace/
 
@@ -192,10 +215,7 @@ ARG PYPI_MIRROR
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
-# 设置环境变量
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
+
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
