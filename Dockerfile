@@ -10,7 +10,7 @@ ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 
 RUN apt-get update -y && \
-    apt-get install -y python3-pip git
+    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
     
 
 
@@ -175,41 +175,41 @@ RUN mv vllm test_docs/
 
 #################### OPENAI API SERVER ####################
 # openai api server alternative
-FROM vllm-base AS vllm-openai
-ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
-RUN apt-get update -y && \
-    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
+#FROM vllm-base AS vllm-openai
+#ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
+#RUN apt-get update -y && \
+#    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
     
 
 # install additional dependencies for openai api server
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  accelerate
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  hf_transfer
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  modelscope
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  auto-gptq
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  deepspeed
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  datasets
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  jsonlines
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  peft
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  safetensors
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  transformers
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  fastapi
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  uvicorn
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  streamlit
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  accelerate
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  hf_transfer
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  modelscope
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  auto-gptq
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  deepspeed
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  datasets
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  jsonlines
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  peft
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  safetensors
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  transformers
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  fastapi
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  uvicorn
+#RUN --mount=type=cache,target=/root/.cache/pip \
+#    pip install  streamlit
 
-ENV VLLM_USAGE_SOURCE production-docker-image
+#ENV VLLM_USAGE_SOURCE production-docker-image
 
 #ENTRYPOINT ["python3", "-m", "vllm.entrypoints.openai.api_server"]
 #################### OPENAI API SERVER ####################
