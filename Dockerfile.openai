@@ -4,10 +4,11 @@
 #################### OPENAI API SERVER ####################
 # openai api server alternative
 #FROM vllm-base AS vllm-openai
-FROM blackmini/vllm:latest AS dev
+#FROM blackmini/vllm:latest AS dev
+FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS dev
 #ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
-#RUN apt-get update -y && \
-#    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
+RUN apt-get update -y && \
+    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
     
 COPY /usr/local/cuda/bin /usr/local/cuda/bin
 
