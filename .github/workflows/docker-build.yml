@@ -33,7 +33,6 @@ jobs:
              sudo swapoff -a
              sudo rm -f /swapfile   /opt/ghc
              sudo apt clean
-#        #docker rmi $(docker image ls -aq)
              sudo apt-get autoremove -y  
              sudo apt-get autoclean -y  
              docker rmi $(docker image ls -aq)
