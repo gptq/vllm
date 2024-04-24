@@ -28,10 +28,8 @@ jobs:
         haskell: true
         large-packages: true
         docker-images: false
-        swap-storage: true
+        swap-storage: false
         run: |
-             sudo swapoff -a
-             sudo rm -f /swapfile   /opt/ghc
              sudo apt clean
              sudo apt-get autoremove -y  
              sudo apt-get autoclean -y  
@@ -50,7 +48,9 @@ jobs:
         #sudo apt-get autoclean -y  
         #docker rmi $(docker image ls -aq)  
         #df -h
-      
+    - name: Create Docker Volume
+      run: |
+        docker volume create --name myvolume --opt type=none --opt device=/mnt --opt o=bind      
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2  # 设置 Docker Buildx (可选，用于支持多平台构建)
@@ -69,6 +69,9 @@ jobs:
         push: true
         platforms: linux/amd64
         tags: ${{ secrets.DOCKER_USERNAME }}/vllm:latest  # 修改为您的 Docker Hub 用户名和期望的镜像标签
+        load: false
+        cache-from: type=volume,src=myvolume
+        cache-to: type=volume,dest=myvolume
     #- name: Cleanup workspace
     #- run: rm -rf path/to/temp/files
     #- run: docker system prune -af  # 清理未使用的 Docker 对象
