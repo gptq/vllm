@@ -177,7 +177,9 @@ RUN mv vllm test_docs/
 # openai api server alternative
 FROM vllm-base AS vllm-openai
 ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
-
+RUN apt-get update -y && \
+    apt-get install -y python3-pip git vim python3-dev build-essential  cmake libopenmpi-dev libjemalloc-dev libnuma-dev
+    
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
