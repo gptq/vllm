@@ -119,7 +119,8 @@ RUN pip  --verbose wheel flash-attn==${FLASH_ATTN_VERSION} \
 
 #################### vLLM installation IMAGE ####################
 # image with vLLM installed
-FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS vllm-base
+#FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04 AS vllm-base
+FROM nvidia/cuda:12.1.0-base-ubuntu22.04 AS vllm-base
 ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 WORKDIR /vllm-workspace
@@ -180,6 +181,7 @@ FROM vllm-base AS vllm-openai
 #RUN apt-get update -y && \
 #    apt-get install -y python3-pip git vim
     
+COPY --from=flash-attn-builder /usr/local/cuda/bin /usr/local/cuda/bin
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
