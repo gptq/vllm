@@ -30,20 +30,27 @@ jobs:
         docker-images: false
         swap-storage: true
         run: |
+             sudo swapoff -a
+             sudo rm -f /swapfile   /opt/ghc
+             sudo apt clean
+#        #docker rmi $(docker image ls -aq)
+             sudo apt-get autoremove -y  
+             sudo apt-get autoclean -y  
+             docker rmi $(docker image ls -aq)
              df -h
 #    - name: Free disk space2
 #      run: |
         
-    - name: free disk space
-      run: |
-        sudo swapoff -a
-        sudo rm -f /swapfile   /opt/ghc
-        sudo apt clean
+#    - name: free disk space
+      #run: |
+        #sudo swapoff -a
+        #sudo rm -f /swapfile   /opt/ghc
+        #sudo apt clean
 #        #docker rmi $(docker image ls -aq)
-        sudo apt-get autoremove -y  
-        sudo apt-get autoclean -y  
-        docker rmi $(docker image ls -aq)  
-        df -h
+        #sudo apt-get autoremove -y  
+        #sudo apt-get autoclean -y  
+        #docker rmi $(docker image ls -aq)  
+        #df -h
       
 
     - name: Set up Docker Buildx
