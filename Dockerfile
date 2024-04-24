@@ -181,7 +181,31 @@ ARG PYPI_MIRROR=https://pypi.mirrors.ustc.edu.cn/simple/
 
 # install additional dependencies for openai api server
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install  accelerate hf_transfer modelscope  auto-gptq deepspeed datasets jsonlines peft safetensors torch transformers fastapi uvicorn streamlit
+    pip install  accelerate
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  hf_transfer
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  modelscope
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  auto-gptq
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  deepspeed
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  datasets
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  jsonlines
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  peft
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  safetensors
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  transformers
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  fastapi
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  uvicorn
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install  streamlit
 
 ENV VLLM_USAGE_SOURCE production-docker-image
 
