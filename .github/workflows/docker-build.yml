@@ -68,7 +68,7 @@ jobs:
         file: ./Dockerfile.openai
         push: true
         platforms: linux/amd64
-        tags: ${{ secrets.DOCKER_USERNAME }}/vllm:latest  # 修改为您的 Docker Hub 用户名和期望的镜像标签
+        tags: ${{ secrets.DOCKER_USERNAME }}/vllmok:latest  # 修改为您的 Docker Hub 用户名和期望的镜像标签
         load: false
 #        cache-from: type=volume,src=myvolume
 #        cache-to: type=volume,dest=myvolume
